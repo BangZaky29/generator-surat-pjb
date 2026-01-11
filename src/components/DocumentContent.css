@@ -1,0 +1,144 @@
+/* C:\codingVibes\nuansasolution\.subpath\generator-surat-pjb\src\components\DocumentContent.css */
+
+.document-content {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 12pt;
+  line-height: 1.8;
+  color: #000;
+}
+
+/* ================= JUDUL ================= */
+.doc-title {
+  text-align: center;
+  font-weight: bold;
+  font-size: 14pt;
+  margin-bottom: 24px;
+  letter-spacing: 0.5px;
+}
+
+/* ================= PARAGRAF ================= */
+.doc-paragraph {
+  margin-bottom: 14px;
+  text-align: justify;
+}
+
+/* Indent awal paragraf */
+.indent {
+  text-indent: 2em;
+}
+
+/* Indent lanjutan */
+.indent-sub {
+  margin-left: 2em;
+}
+
+/* Indent lebih dalam */
+.indent-deep {
+  margin-left: 4em;
+}
+
+/* ================= SECTION ================= */
+.section-break {
+  margin-bottom: 18px;
+  page-break-inside: avoid;
+}
+
+/* ================= PASAL ================= */
+.pasal-title {
+  text-align: center;
+  font-weight: bold;
+  margin: 20px 0 10px;
+}
+
+/* ================= LIST ================= */
+.doc-list {
+  margin-left: 2.2em;
+  margin-top: 8px;
+}
+
+.doc-list li {
+  margin-bottom: 8px;
+  text-align: justify;
+}
+
+/* ================= TANDA TANGAN ================= */
+.signature-section {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 60px;
+  page-break-inside: avoid;
+}
+
+.signature-box {
+  width: 45%;
+  text-align: center;
+}
+
+.signature-label {
+  font-weight: bold;
+  margin-bottom: 60px;
+}
+
+.signature-space {
+  height: 80px;
+}
+
+.signature-name {
+  font-weight: bold;
+  margin-top: 8px;
+}
+
+.signature-name-istri {
+  margin-top: 4px;
+}
+
+/* ================= MOBILE PREVIEW ================= */
+@media screen and (max-width: 768px) {
+  .document-content {
+    font-size: 10pt;
+    line-height: 1.6;
+  }
+
+  .doc-title {
+    font-size: 12pt;
+    margin-bottom: 16px;
+  }
+}
+
+/* ================= MOBILE PREVIEW - FULL WIDTH ================= */
+@media screen and (max-width: 768px) {
+  .preview-container {
+    padding: 6px;
+  }
+
+  .a4-page {
+    max-width: 100%;
+    width: 100%;
+    padding: 12px 14px; /* HAMPIR FULL */
+    margin: 0 auto;
+    box-shadow: none;
+    transform: none;
+  }
+
+  .document-content {
+    font-size: 10pt;
+    line-height: 1.6;
+  }
+
+  .doc-title {
+    font-size: 12pt;
+    margin-bottom: 14px;
+  }
+
+  .indent {
+    text-indent: 1.5em;
+  }
+
+  .indent-sub {
+    margin-left: 1.5em;
+  }
+
+  .indent-deep {
+    margin-left: 2.5em;
+  }
+}
