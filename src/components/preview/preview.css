@@ -1,0 +1,47 @@
+@media screen {
+  .a4-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .a4-paper {
+    width: 210mm;
+    height: 297mm;
+    padding: 2cm;
+    background: white;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    overflow: hidden;
+  }
+
+  .page-number {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #666;
+  }
+}
+
+@media print {
+  body {
+    margin: 0;
+  }
+
+  .a4-paper {
+    box-shadow: none;
+    overflow: visible;
+  }
+
+  .page-number {
+    display: none;
+  }
+
+  @page {
+    size: A4;
+    margin: 2cm;
+  }
+}
+
+.avoid-break {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
