@@ -4,39 +4,45 @@ import React, { useState } from 'react';
 import { FileText, User, Users, FileEdit, Download, ChevronDown, ChevronUp, Home } from 'lucide-react';
 import logo from './assets/NS_white_01.png';
 import PreviewPJB from './components/PreviewPJB';
+import { Printer } from 'lucide-react';
+import { generatePDFPJB } from '../src/utils/generatePDFPJB';
 
 // ============= CONFIG DEFAULT DATA =============
 const DEFAULT_CONFIG = {
-  tanggalLengkap: 'tujuh Oktober Tahun dua ribu dua puluh lima (07-10-2025)',
-  namaPenjual: 'ZULFI TRESNA KUSUMA',
-  tempatLahirPenjual: 'Bogor',
-  tanggalLahirPenjual: 'dua puluh lima Januari Tahun seribu sembilan ratus tujuh puluh satu (25-01-1971)',
-  pekerjaanPenjual: 'Karyawan Swasta',
-  alamatPenjual: 'Jalan Letnan Sukarna Nomor 33, Rukun Tetangga 003, Rukun Warga 001, Kelurahan/Desa Benteng, Kecamatan Ciampea, Kabupaten Bogor, Provinsi Jawa Barat',
-  ktpPenjual: '3201152501710001',
-  adaIstri: true,
-  namaIstri: 'YULIANA SUTISNA',
-  tempatLahirIstri: 'Bogor',
-  tanggalLahirIstri: 'empat belas Juli Tahun seribu sembilan ratus delapan puluh satu (14-07-1981)',
-  pekerjaanIstri: 'Mengurus Rumah Tangga',
-  ktpIstri: '3201155407810003',
-  namaPembeli: 'RESPA ARYANSYAH',
-  tempatLahirPembeli: 'Bogor',
-  tanggalLahirPembeli: 'dua puluh tujuh November Tahun seribu sembilan ratus sembilan puluh delapan (27-11-1998)',
-  alamatPembeli: 'Kampung Pabuaran, Rukun Tetangga 002, Rukun Warga 003, Kelurahan/Desa Ciampea, Kecamatan Ciampea, Kabupaten Bogor, Provinsi Jawa Barat',
-  ktpPembeli: '3201152711980003',
-  lokasiTanah: 'Kampung Benteng, Rukun Tetangga 001, Rukun Warga 003, Kelurahan/Desa Benteng, Kecamatan Ciampea, Kabupaten Bogor, Provinsi Jawa Barat',
-  luasTanah: '130',
-  luasTanahTerbilang: 'seratus tiga puluh meter persegi',
-  spptPbb: '32.03.040.018.003.0213.0',
-  hargaJual: '136.500.000',
-  hargaJualTerbilang: 'Seratus Tiga Puluh Enam Juta Lima Ratus Ribu Rupiah',
-  dp: '68.250.000',
-  dpTerbilang: 'Enam Puluh Delapan Juta Dua Ratus Lima Puluh Ribu Rupiah',
-  tanggalDp: 'Selasa 07 Oktober 2025',
-  rekeningPenjual: 'ZULFI TRESNA KUSUMA',
-  pengadilan: 'Pengadilan Negeri Cibinong, di Cibinong, Kabupaten Bogor'
+  tanggalLengkap: '', // kosong, nanti user isi
+  namaPenjual: '', // placeholder sederhana
+  tempatLahirPenjual: '',
+  tanggalLahirPenjual: '',
+  pekerjaanPenjual: '',
+  alamatPenjual: '',
+  ktpPenjual: '', // NIK default
+
+  adaIstri: false, // default belum ada
+  namaIstri: '',
+  tempatLahirIstri: '',
+  tanggalLahirIstri: '',
+  pekerjaanIstri: '',
+  ktpIstri: '',
+
+  namaPembeli: '',
+  tempatLahirPembeli: '',
+  tanggalLahirPembeli: '',
+  alamatPembeli: '',
+  ktpPembeli: '',
+
+  lokasiTanah: '',
+  luasTanah: '',
+  luasTanahTerbilang: '',
+  spptPbb: '',
+  hargaJual: '',
+  hargaJualTerbilang: '',
+  dp: '',
+  dpTerbilang: '',
+  tanggalDp: '',
+  rekeningPenjual: '',
+  pengadilan: ''
 };
+
 
 // Component: Accordion
 const Accordion = ({ title, icon: Icon, children, isOpen, onToggle }) => (
@@ -89,6 +95,8 @@ const TextareaField = ({ label, name, value, onChange, placeholder, rows = 3 }) 
 
 // Main App Component
 export default function App() {
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [notification, setNotification] = useState(null); // null | { type: 'success' | 'error' | 'info', message: string }
   const [viewMode, setViewMode] = useState('form');
   const [openSections, setOpenSections] = useState({
     tanggal: true,
@@ -112,8 +120,44 @@ export default function App() {
     window.print();
   };
 
+  // ✅ Move handleDownloadPDF here
+  const handleDownloadPDF = async () => {
+    try {
+      setIsDownloading(true);
+      setNotification({ type: 'info', message: 'Sedang menyiapkan PDF...' });
+
+      // generatePDFPJB bisa dibuat async jika belum
+      await generatePDFPJB(formData);  
+
+      setIsDownloading(false);
+      setNotification({ type: 'success', message: 'PDF berhasil diunduh!' });
+
+      // hide notifikasi otomatis setelah 3 detik
+      setTimeout(() => setNotification(null), 3000);
+
+    } catch (error) {
+      console.error(error);
+      setIsDownloading(false);
+      setNotification({ type: 'error', message: 'Gagal mengunduh PDF.' });
+      setTimeout(() => setNotification(null), 3000);
+    }
+  };
+
+
+
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Notification */}
+        {notification && (
+          <div
+            className={`fixed top-4 right-4 z-50 px-4 py-3 rounded shadow-lg text-white
+              ${notification.type === 'success' ? 'bg-green-500' : ''}
+              ${notification.type === 'error' ? 'bg-red-500' : ''}
+              ${notification.type === 'info' ? 'bg-blue-500' : ''}`}
+          >
+            {notification.message}
+          </div>
+        )}
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-gray-200 print:hidden">
         <div className="container mx-auto px-4 py-4">
@@ -166,14 +210,14 @@ export default function App() {
 
               {/* Data Penjual */}
               <Accordion title="Data Pihak Pertama (Penjual)" icon={User} isOpen={openSections.penjual} onToggle={() => toggleSection('penjual')}>
-                <InputField label="Nama Lengkap" name="namaPenjual" value={formData.namaPenjual} onChange={handleInputChange} placeholder="ZULFI TRESNA KUSUMA" />
+                <InputField label="Nama Lengkap" name="namaPenjual" value={formData.namaPenjual} onChange={handleInputChange} placeholder="Atas Nama..." />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <InputField label="Tempat Lahir" name="tempatLahirPenjual" value={formData.tempatLahirPenjual} onChange={handleInputChange} placeholder="Bogor" />
                   <TextareaField label="Tanggal Lahir (Terbilang)" name="tanggalLahirPenjual" value={formData.tanggalLahirPenjual} onChange={handleInputChange} placeholder="dua puluh lima Januari..." rows={2} />
                 </div>
                 <InputField label="Pekerjaan" name="pekerjaanPenjual" value={formData.pekerjaanPenjual} onChange={handleInputChange} placeholder="Karyawan Swasta" />
                 <TextareaField label="Alamat Lengkap" name="alamatPenjual" value={formData.alamatPenjual} onChange={handleInputChange} placeholder="Jalan Letnan Sukarna..." rows={3} />
-                <InputField label="Nomor KTP" name="ktpPenjual" value={formData.ktpPenjual} onChange={handleInputChange} placeholder="3201152501710001" />
+                <InputField label="Nomor KTP" name="ktpPenjual" value={formData.ktpPenjual} onChange={handleInputChange} placeholder="No.ktp penjual" />
                 
                 <div className="mb-4">
                   <label className="flex items-center gap-2 cursor-pointer">
@@ -184,26 +228,26 @@ export default function App() {
 
                 {formData.adaIstri && (
                   <div className="pl-4 border-l-2 border-blue-200">
-                    <InputField label="Nama Istri" name="namaIstri" value={formData.namaIstri} onChange={handleInputChange} placeholder="YULIANA SUTISNA" />
+                    <InputField label="Nama Istri" name="namaIstri" value={formData.namaIstri} onChange={handleInputChange} placeholder="Atas Nama..." />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <InputField label="Tempat Lahir Istri" name="tempatLahirIstri" value={formData.tempatLahirIstri} onChange={handleInputChange} placeholder="Bogor" />
                       <TextareaField label="Tanggal Lahir Istri" name="tanggalLahirIstri" value={formData.tanggalLahirIstri} onChange={handleInputChange} placeholder="empat belas Juli..." rows={2} />
                     </div>
                     <InputField label="Pekerjaan Istri" name="pekerjaanIstri" value={formData.pekerjaanIstri} onChange={handleInputChange} placeholder="Mengurus Rumah Tangga" />
-                    <InputField label="Nomor KTP Istri" name="ktpIstri" value={formData.ktpIstri} onChange={handleInputChange} placeholder="3201155407810003" />
+                    <InputField label="Nomor KTP Istri" name="ktpIstri" value={formData.ktpIstri} onChange={handleInputChange} placeholder="No.ktp istri" />
                   </div>
                 )}
               </Accordion>
 
               {/* Data Pembeli */}
               <Accordion title="Data Pihak Kedua (Pembeli)" icon={Users} isOpen={openSections.pembeli} onToggle={() => toggleSection('pembeli')}>
-                <InputField label="Nama Lengkap" name="namaPembeli" value={formData.namaPembeli} onChange={handleInputChange} placeholder="RESPA ARYANSYAH" />
+                <InputField label="Nama Lengkap" name="namaPembeli" value={formData.namaPembeli} onChange={handleInputChange} placeholder="Atas Nama..." />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <InputField label="Tempat Lahir" name="tempatLahirPembeli" value={formData.tempatLahirPembeli} onChange={handleInputChange} placeholder="Bogor" />
                   <TextareaField label="Tanggal Lahir (Terbilang)" name="tanggalLahirPembeli" value={formData.tanggalLahirPembeli} onChange={handleInputChange} placeholder="dua puluh tujuh November..." rows={2} />
                 </div>
                 <TextareaField label="Alamat Lengkap" name="alamatPembeli" value={formData.alamatPembeli} onChange={handleInputChange} placeholder="Kampung Pabuaran..." rows={3} />
-                <InputField label="Nomor KTP" name="ktpPembeli" value={formData.ktpPembeli} onChange={handleInputChange} placeholder="3201152711980003" />
+                <InputField label="Nomor KTP" name="ktpPembeli" value={formData.ktpPembeli} onChange={handleInputChange} placeholder="No.ktp pembeli" />
               </Accordion>
 
               {/* Objek Jual Beli */}
@@ -213,7 +257,7 @@ export default function App() {
                   <InputField label="Luas Tanah (M²)" name="luasTanah" value={formData.luasTanah} onChange={handleInputChange} placeholder="130" type="number" />
                   <InputField label="Luas Tanah (Terbilang)" name="luasTanahTerbilang" value={formData.luasTanahTerbilang} onChange={handleInputChange} placeholder="seratus tiga puluh meter persegi" />
                 </div>
-                <InputField label="SPPT PBB" name="spptPbb" value={formData.spptPbb} onChange={handleInputChange} placeholder="32.03.040.018.003.0213.0" />
+                <InputField label="SPPT PBB" name="spptPbb" value={formData.spptPbb} onChange={handleInputChange} placeholder="No.sppt pbb" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <InputField label="Harga Jual (Angka)" name="hargaJual" value={formData.hargaJual} onChange={handleInputChange} placeholder="136500000" />
                   <InputField label="Harga Jual (Terbilang)" name="hargaJualTerbilang" value={formData.hargaJualTerbilang} onChange={handleInputChange} placeholder="Seratus Tiga Puluh Enam Juta..." />
@@ -223,8 +267,8 @@ export default function App() {
                   <InputField label="DP (Terbilang)" name="dpTerbilang" value={formData.dpTerbilang} onChange={handleInputChange} placeholder="Enam Puluh Delapan Juta..." />
                 </div>
                 <InputField label="Tanggal Pembayaran DP" name="tanggalDp" value={formData.tanggalDp} onChange={handleInputChange} placeholder="Selasa 07 Oktober 2025" />
-                <InputField label="Rekening Atas Nama" name="rekeningPenjual" value={formData.rekeningPenjual} onChange={handleInputChange} placeholder="ZULFI TRESNA KUSUMA" />
-                <InputField label="Pengadilan Domisili" name="pengadilan" value={formData.pengadilan} onChange={handleInputChange} placeholder="Pengadilan Negeri Cibinong..." />
+                <InputField label="Rekening Atas Nama" name="rekeningPenjual" value={formData.rekeningPenjual} onChange={handleInputChange} placeholder="Atas Nama..." />
+                <InputField label="Pengadilan Domisili" name="pengadilan" value={formData.pengadilan} onChange={handleInputChange} placeholder="Pengadilan Negeri..." />
               </Accordion>
             </div>
           </div>
@@ -237,13 +281,39 @@ export default function App() {
                   <span className="bg-blue-100 text-blue-800 rounded-full w-8 h-8 inline-flex items-center justify-center text-sm mr-2">2</span>
                   Pratinjau Hasil
                 </h2>
-                <button
-                  onClick={handlePrint}
-                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-semibold transition-colors shadow-sm text-sm md:text-base"
-                >
-                  <Download className="w-4 h-4 md:w-5 md:h-5" />
-                  Cetak PDF
-                </button>
+                <div className="flex justify-end gap-4 mb-4 print:hidden">
+                  <button
+                    onClick={handleDownloadPDF}
+                    disabled={isDownloading}
+                    className={`flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-lg font-semibold transition-colors shadow-sm text-sm md:text-base
+                      ${isDownloading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+                  >
+                    {isDownloading ? (
+                      <>
+                        <svg className="w-4 h-4 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4l-3 3 3 3h-4z"></path>
+                        </svg>
+                        Sedang Mengunduh...
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-4 h-4 md:w-5 md:h-5" />
+                        PDF
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    onClick={handlePrint}
+                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-semibold transition-colors shadow-sm text-sm md:text-base"
+                  >
+                    <Printer className="w-4 h-4 md:w-5 md:h-5" />
+                    PRINT
+                  </button>
+
+                </div>
+
               </div>
             </div>
 
