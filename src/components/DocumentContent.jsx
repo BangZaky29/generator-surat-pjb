@@ -5,7 +5,7 @@ import './DocumentContent.css';
 const DocumentContent = ({ data, page = 1 }) => (
   <div className="document-content">
     
-    {/* PAGE 1 - JUDUL & PIHAK PERTAMA & PIHAK KEDUA */}
+    {/* PAGE 1 - JUDUL nya  & PIHAK PERTAMA & PIHAK KEDUA */}
     {page === 1 && (
       <>
         {/* Judul */}
